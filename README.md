@@ -14,7 +14,7 @@ O se mete Glitch en las salidas.
 
 ## Diagrama
 
-Falta poner el diagrama funcional
+![Columpio v1](docs/workflow.jpg)
 
 ## Circuito
 

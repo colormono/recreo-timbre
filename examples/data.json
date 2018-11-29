@@ -1,0 +1,7 @@
+{
+  "mute": "false",
+  "start": "true",
+  "ringFor": "3333",
+  "playFor": "5000",
+  "workFor": "5000"
+}
