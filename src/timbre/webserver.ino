@@ -6,8 +6,32 @@ void setupServer() {
   server.on("/", handleRoot);
   server.on("/save", handleSave);
   server.on("/demo", handleDemo);
+  server.on("/pomodoro", handlePomodoro);
+  server.on("/testing", handleTesting);
+  server.on("/testRelay", testRelay);
+  server.on("/testDisplay", testDisplay);
+  server.on("/getADC", handleADC); //Reads ADC function is called from out index.html
+  server.onNotFound(handleWebRequests); //Set setver all paths are not found so we can handle as per URI
   server.begin();
   Serial.println("HTTP server started");
+  delay(1000);
+}
+
+void handleWebRequests() {
+  if (loadFromSpiffs(server.uri())) return;
+  String message = "File Not Detected\n\n";
+  message += "URI: ";
+  message += server.uri();
+  message += "\nMethod: ";
+  message += (server.method() == HTTP_GET) ? "GET" : "POST";
+  message += "\nArguments: ";
+  message += server.args();
+  message += "\n";
+  for (uint8_t i = 0; i < server.args(); i++) {
+    message += " NAME:" + server.argName(i) + "\n VALUE:" + server.arg(i) + "\n";
+  }
+  server.send(404, "text/plain", message);
+  Serial.println(message);
 }
 
 bool loadConfig() {
@@ -53,70 +77,85 @@ bool loadConfig() {
   return true;
 }
 
+bool loadFromSpiffs(String path) {
+  String dataType = "text/plain";
+  if (path.endsWith("/")) path += "index.htm";
 
-// --- TEMPLATE HTML ---
-// TODO
-// - host styles on local server ()
+  if (path.endsWith(".src")) path = path.substring(0, path.lastIndexOf("."));
+  else if (path.endsWith(".html")) dataType = "text/html";
+  else if (path.endsWith(".htm")) dataType = "text/html";
+  else if (path.endsWith(".css")) dataType = "text/css";
+  else if (path.endsWith(".js")) dataType = "application/javascript";
+  else if (path.endsWith(".png")) dataType = "image/png";
+  else if (path.endsWith(".gif")) dataType = "image/gif";
+  else if (path.endsWith(".jpg")) dataType = "image/jpeg";
+  else if (path.endsWith(".ico")) dataType = "image/x-icon";
+  else if (path.endsWith(".xml")) dataType = "text/xml";
+  else if (path.endsWith(".pdf")) dataType = "application/pdf";
+  else if (path.endsWith(".zip")) dataType = "application/zip";
+  File dataFile = SPIFFS.open(path.c_str(), "r");
+  if (server.hasArg("download")) dataType = "application/octet-stream";
+  if (server.streamFile(dataFile, dataType) != dataFile.size()) {
+  }
 
-String msg = "";
-
-String body = "<!DOCTYPE html>"
-              "<html>"
-              "<head>"
-              "<title>Timbre Config</title>"
-              "<meta name='viewport' content='width=device-width, initial-scale=1, user-scalable=no'>"
-              "<meta charset='UTF-8'>"
-              "<style>*{text-align:center;font-family:helvetica,arial;}"
-              ".btn{display:block;padding:10px;margin:10px;background-color:#00ccff;color:#000000;text-decoration:none;border:none;}"
-              "input{width:100%;margin:10px;padding:10px;}</style>"
-              "</head>"
-              "<body>"
-              "<h4>Pomodoro</h4>"
-              "<a class='btn' href='/?pomodoro=1'>Pomodoro Focus</a> "
-              "<a class='btn' href='/?pomodoro=2'>Pomodoro Break</a> "
-              "<h4>Device</h4>"
-              "<a class='btn' href='/demo?timePlay=20&timeWork=1'>Recreo Demo</a> "
-              "<h4>Relay</h4>"
-              "<a class='btn' href='/?relay=1'>Relay ON</a> "
-              "<a class='btn' href='/?relay=2'>Relay OFF</a> "
-              "<h4>Led</h4>"
-              "<a class='btn' href='/?led=1'>Success</a> "
-              "<a class='btn' href='/?led=2'>Warning</a> "
-              "<a class='btn' href='/?led=3'>Error</a> "
-              "<a class='btn' href='/?r=255&g=100&b=120'>Custom color</a> "
-              "<h4>Display</h4>"
-              "<a class='btn' href='/?display=1'>Loading</a> "
-              "<a class='btn' href='/?display=2'>Play</a> "
-              "<a class='btn' href='/?display=3'>Code</a> "
-              "<hr />"
-              "<h4>Setup</h4>"
-              "<form action='save' method='get'>"
-              "<p>io_server:<br>"
-              "<input class='input' name='io_server' type='text' placeholder='dato actual'></p>"
-              "<p>io_server_port:<br>"
-              "<input class='input' name='io_server_port' type='text' placeholder='dato actual'></p>"
-              "<p>modo:<br>"
-              "<input class='input' name='object_mode' type='number' placeholder='dato actual'></p>"
-              "<p><input class='btn' type='submit' value='GUARDAR'/></p>"
-              "</form>";
-
-String footer = "</body>"
-                "</html>";
-
+  dataFile.close();
+  return true;
+}
 
 // --- RUTAS ---
 
-void handleRoot() {
-  //server.send(200, "text/plain", "hello world from esp8266!");
-  server.send(200, "text/html", body + msg + footer);
+void handleADC() {
+  int a = analogRead(A0);
+  a = map(a, 0, 1023, 0, 100);
+  String adc = String(a);
+  Serial.println(adc);
+  server.send(200, "text/plane", adc);
+}
 
-  // Relay
-  int relayState = server.arg("relay").toInt();
-  if ( relayState == 1) {
+void handleRoot() {
+  server.sendHeader("Location", "/index.html", true);
+  server.send(302, "text/plane", "");
+}
+
+void handleTesting() {
+  server.sendHeader("Location", "/testing.html", true);
+  server.send(302, "text/plane", "");
+}
+
+void handlePomodoro() {
+  server.sendHeader("Location", "/pomodoro.html", true);
+  server.send(302, "text/plane", "");
+}
+
+// --- TESTS ---
+
+void testRelay() {
+  int value = server.arg("value").toInt();
+  if ( value == 1) {
     ringOn();
-  } else if ( relayState == 2) {
+  } else {
     ringOff();
   }
+  server.send(200, "text/plane", String(value));
+}
+
+void testDisplay() {
+  int value = server.arg("value").toInt();
+  if ( value == 0) {
+    setDisplayLoading();
+  } else if ( value == 1) {
+    setDisplayPlay();
+  } else if ( value == 2 ) {
+    setDisplayCode();
+  } else {
+    display.print("COLORMONO");
+  }
+  server.send(200, "text/plane", String(value));
+}
+
+void handleRoot2() {
+  //server.send(200, "text/plain", "hello world from esp8266!");
+  //server.send(200, "text/html", body + msg + footer);
 
   // Led
   int ledState = server.arg("led").toInt();
@@ -134,16 +173,6 @@ void handleRoot() {
   int ledB = server.arg("b").toInt();
   if ( ledR && ledG && ledB ) {
     setColor(ledR, ledG, ledB);
-  }
-
-  // Display
-  int displayState = server.arg("display").toInt();
-  if ( displayState == 1) {
-    setDisplayLoading();
-  } else if ( displayState == 2) {
-    setDisplayPlay();
-  } else if ( displayState == 3 ) {
-    setDisplayCode();
   }
 
   // Pomodoro
@@ -165,13 +194,13 @@ void handleSave() {
 
   File configFile = SPIFFS.open("/config.json", "w");
   if (!configFile) {
-    msg = "Failed to open config file for writing";
+    //msg = "Failed to open config file for writing";
   } else {
-    msg = "Configuracion Guardada...";
+    //msg = "Configuracion Guardada...";
   }
 
   json.printTo(configFile);
-  server.send(200, "text/html", body + msg + footer);
+  //server.send(200, "text/html", body + msg + footer);
 
   // restart
   //ESP.restart();
@@ -181,6 +210,6 @@ void handleDemo() {
   int timePlay = server.arg("timePlay").toInt();
   int timeWork = server.arg("timeWork").toInt();
   startRecreo(timePlay, timeWork);
-  server.send(200, "text/html", body + msg + footer);
+  //server.send(200, "text/html", body + msg + footer);
 }
 

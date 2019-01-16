@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, user-scalable=no"
+    />
+    <title>Timbre Testing</title>
+    <script src="\jquery.min.js"></script>
+    <link rel="stylesheet" href="\style.css" />
+  </head>
+  <body>
+    <h2>Testing</h2>
+
+    <h4>Device</h4>
+    <a class="btn" href="/demo?timePlay=20&timeWork=1">Recreo Demo</a>
+    <h4>Relay</h4>
+    <a class="btn" id="relayOn" href="#">Relay ON</a>
+    <a class="btn" id="relayOff" href="#">Relay OFF</a>
+    <h4>Led</h4>
+    <a class="btn" href="/?led=1">Success</a>
+    <a class="btn" href="/?led=2">Warning</a>
+    <a class="btn" href="/?led=3">Error</a>
+    <a class="btn" href="/?r=255&g=100&b=120">Custom color</a>
+    <h4>Display</h4>
+    <a class="btn" id="displayLoading" href="#">Loading</a>
+    <a class="btn" id="displayPlay" href="#">Play</a>
+    <a class="btn" id="displayCode" href="#">Code</a>
+    <hr />
+    <div id="messages"></div>
+
+    <script>
+      $(function() {
+        // Relay
+        $('#relayOn').on('click', function() {
+          $.ajax({
+            url: '/testRelay?value=1',
+            success: function(result) {
+              $('#messages').html(result);
+            }
+          });
+        });
+
+        $('#relayOff').on('click', function() {
+          $.ajax({
+            url: '/testRelay?value=0',
+            success: function(result) {
+              $('#messages').html(result);
+            }
+          });
+        });
+
+        // Display
+        $('#displayLoading').on('click', function() {
+          $.ajax({
+            url: '/testDisplay?value=0',
+            success: function(result) {
+              $('#message').html(result);
+            }
+          });
+        });
+
+        $('#displayPlay').on('click', function() {
+          $.ajax({
+            url: '/testDisplay?value=1',
+            success: function(result) {
+              $('#message').html(result);
+            }
+          });
+        });
+
+        $('#displayCode').on('click', function() {
+          $.ajax({
+            url: '/testDisplay?value=2',
+            success: function(result) {
+              $('#message').html(result);
+            }
+          });
+        });
+      });
+    </script>
+  </body>
+</html>

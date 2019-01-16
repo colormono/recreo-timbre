@@ -8,13 +8,13 @@
    - Genera un webserver para testing y control remoto
 */
 
-#include "FS.h"
-#include <ESP8266WiFi.h>
+#include <FS.h>   //Include File System Headers
 #include <DNSServer.h>
+#include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
 #include <WiFiManager.h>
 #include <string.h>
-#include  <Chrono.h>
+#include <Chrono.h>
 
 #include <WebSocketsClient.h>
 #include <Hash.h>
@@ -40,6 +40,7 @@ Chrono chronoLed;
 
 
 // Config: Server
+const char* htmlfile = "/index.html";
 ESP8266WebServer server(80);
 void setupServer();
 bool loadConfig();
@@ -47,7 +48,14 @@ bool saveConfig();
 void handleRoot();
 void handleSave();
 void handleDemo();
-
+void handleADC();
+void handleTesting();
+void handlePomodoro();
+void handleWebRequests();
+bool loadFromSpiffs(String path);
+// Tests
+void testRelay();
+void testDisplay();
 
 // --- INPUTS ---
 
@@ -104,7 +112,9 @@ void startRecreo(int timePlay, int timeWork);
 // --- SETUP ---
 
 void setup() {
+  delay(1000);
   Serial.begin(115200);
+  Serial.println();
 
   // LED
   pinMode(LED_RED, OUTPUT);
@@ -129,6 +139,10 @@ void setup() {
   // sino inicializar como AP
   wifiManager.autoConnect("TimbreAP");
   Serial.println("conectado... :)");
+
+  //Initialize File System
+  SPIFFS.begin();
+  Serial.println("File System Initialized");
 
   // Load config
   if (!SPIFFS.begin()) {
@@ -165,6 +179,8 @@ void setup() {
 // --- LOOP ---
 
 void loop() {
+  // Server
+  server.handleClient();
 
   // Recreo WS
   if (object_mode == 1) {
@@ -192,15 +208,12 @@ void loop() {
 
   // Autonomo
   else if (object_mode == 2) {
-    startRecreo();
+    //startRecreo();
   }
 
   // Pomodoro
   else if (object_mode == 3) {
     // control from app
   }
-
-  // Server
-  server.handleClient();
 }
 

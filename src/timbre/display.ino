@@ -8,6 +8,7 @@ void showLocalIp() {
   chronoDisplay.restart();
 
   while (counter != repeat) {
+    yield();
     if (chronoDisplay.hasPassed(3000)) {
       chronoDisplay.restart();
       display.print(WiFi.localIP().toString().c_str());
