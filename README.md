@@ -1,6 +1,6 @@
 # Timbre
 
-![Timbre Render v1](docs/07_Timbre_v01.jpg)
+![Timbre Render v1](./docs/07_Timbre_v01.jpg)
 
 **Objeto sonoro interactivo. Timbre de escuela, arduino.**
 
@@ -12,6 +12,9 @@ Es el encargado de comunicar el comienzo y fin del recreo. Divide la temporalida
 
 - [Instrucciones](#instrucciones)
 - [Flujo de trabajo](#flujo-de-trabajo)
+  - [Configurar AP](#configurar-ap)
+  - [Configurar WebSockets](#configurar-websockets)
+  - [Testing](#testing)
 - [Circuito](#circuito)
 - [Código](#código)
   - [API](#api)
@@ -66,9 +69,13 @@ ESP will try to connect. If successful, it relinquishes control back to your app
 
 #### Testing
 
+- Ruta "/": Index
+- Ruta "/testing": Probar funcionalidades
+- Ruta "/pomodoro": Configurar Pomodoro
+
 ## Flujo de trabajo
 
-![Columpio v1](docs/workflow.jpg)
+![Columpio v1](./docs/workflow.jpg)
 
 ## Circuito
 
@@ -124,3 +131,6 @@ En el directorio `/examples` se encuentran sketchs con posibles soluciones a los
 - [Example of ESP8266 Flash File System (SPIFFS)](https://circuits4you.com/2018/01/31/example-of-esp8266-flash-file-system-spiffs/) - Almacenar en la memoria flash archivos (configuración y contenidos)
 - [ESP8266 – SPIFFS + JSON](http://www.sinaptec.alomar.com.ar/2017/06/tutorial-8-esp8266-spiffs-json.html) - Tutorial SPIFFS y JSON
 - [NodeMCU RGB LED on Arduino IDE](https://roboindia.com/tutorials/RGB-LED-nodemcu) - Tutorial LED RGB
+- [ESP8266 Ajax Update without refreshing](https://circuits4you.com/2018/02/04/esp8266-ajax-update-part-of-web-page-without-refreshing/)
+- [ESP8266 Json parsing example](https://circuits4you.com/2019/01/11/nodemcu-esp8266-arduino-json-parsing-example/)
+- [ESP8266 data logging with real time graphs](https://circuits4you.com/2019/01/11/esp8266-data-logging-with-real-time-graphs/)

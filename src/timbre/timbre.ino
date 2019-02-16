@@ -48,13 +48,13 @@ bool saveConfig();
 void handleRoot();
 void handleSave();
 void handleDemo();
-void handleADC();
 void handleTesting();
 void handlePomodoro();
 void handleWebRequests();
 bool loadFromSpiffs(String path);
 // Tests
 void testRelay();
+void testLed();
 void testDisplay();
 
 // --- INPUTS ---

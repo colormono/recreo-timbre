@@ -7,37 +7,56 @@
       content="width=device-width, initial-scale=1, user-scalable=no"
     />
     <title>Timbre Testing</title>
-    <script src="\jquery.min.js"></script>
-    <link rel="stylesheet" href="\style.css" />
+    <script src="scripts/jquery.min.js"></script>
+    <link rel="stylesheet" href="styles/baseguide.min.css" />
   </head>
-  <body>
-    <h2>Testing</h2>
+  <body style="padding: 2em 1em">
+    <div class="container">
+      <h2>Testing</h2>
+      <p id="messages" class="text-center"></p>
 
-    <h4>Device</h4>
-    <a class="btn" href="/demo?timePlay=20&timeWork=1">Recreo Demo</a>
-    <h4>Relay</h4>
-    <a class="btn" id="relayOn" href="#">Relay ON</a>
-    <a class="btn" id="relayOff" href="#">Relay OFF</a>
-    <h4>Led</h4>
-    <a class="btn" href="/?led=1">Success</a>
-    <a class="btn" href="/?led=2">Warning</a>
-    <a class="btn" href="/?led=3">Error</a>
-    <a class="btn" href="/?r=255&g=100&b=120">Custom color</a>
-    <h4>Display</h4>
-    <a class="btn" id="displayLoading" href="#">Loading</a>
-    <a class="btn" id="displayPlay" href="#">Play</a>
-    <a class="btn" id="displayCode" href="#">Code</a>
-    <hr />
-    <div id="messages"></div>
+      <h4>Device</h4>
+      <button class="btn" type="submit" id="demo">Recreo Demo</button>
+
+      <h4>Relay</h4>
+      <button class="btn" type="submit" id="relayOn">Relay ON</button>
+      <button class="btn" type="submit" id="relayOff">Relay OFF</button>
+
+      <h4>Led</h4>
+      <button class="btn" type="submit" id="ledSuccess">Success</button>
+      <button class="btn" type="submit" id="ledWarning">Warning</button>
+      <button class="btn" type="submit" id="ledError">Error</button>
+
+      <h4>Display</h4>
+      <button class="btn" type="submit" id="displayLoading">Loading</button>
+      <button class="btn" type="submit" id="displayPlay">Play</button>
+      <button class="btn" type="submit" id="displayCode">Code</button>
+
+      <hr style="margin-top: 2em;" />
+      <a class="btn" href="/" role="button">Setup</a>
+      <a class="btn" href="/testing" role="button">Testing</a>
+      <a class="btn" href="/pomodoro" role="button">Pomodoro</a>
+    </div>
 
     <script>
       $(function() {
+        // Device
+        $('#demo').on('click', function() {
+          $.ajax({
+            url: '/demo?timePlay=20&timeWork=1',
+            success: function(result) {
+              $('#messages').html('Corriendo el demo.');
+            }
+          });
+        });
+
         // Relay
         $('#relayOn').on('click', function() {
           $.ajax({
             url: '/testRelay?value=1',
             success: function(result) {
-              $('#messages').html(result);
+              var status = result ? 'encendido' : 'apagado';
+              $('#messages').html('Relay ' + status);
             }
           });
         });
@@ -46,7 +65,39 @@
           $.ajax({
             url: '/testRelay?value=0',
             success: function(result) {
-              $('#messages').html(result);
+              var status = result ? 'encendido' : 'apagado';
+              $('#messages').html('Relay ' + status);
+            }
+          });
+        });
+
+        // Led
+        $('#ledSuccess').on('click', function() {
+          $.ajax({
+            url: '/testLed?value=1',
+            success: function(result) {
+              console.log(result);
+              $('#messages').html('Led: Success');
+            }
+          });
+        });
+
+        $('#ledWarning').on('click', function() {
+          $.ajax({
+            url: '/testLed?value=2',
+            success: function(result) {
+              console.log(result);
+              $('#messages').html('Led: Warning');
+            }
+          });
+        });
+
+        $('#ledError').on('click', function() {
+          $.ajax({
+            url: '/testLed?value=3',
+            success: function(result) {
+              console.log(result);
+              $('#messages').html('Led: Error');
             }
           });
         });

@@ -6,100 +6,146 @@
       name="viewport"
       content="width=device-width, initial-scale=1, user-scalable=no"
     />
-
-    <title>Timbre Config</title>
-    <script src="\jquery.min.js"></script>
-    <script src="\d3-gauge.js"></script>
-    <link rel="stylesheet" href="\style.css" />
+    <title>Timbre Setup</title>
+    <script src="scripts/jquery.min.js"></script>
+    <link rel="stylesheet" href="styles/baseguide.min.css" />
   </head>
-  <body>
+  <body style="padding: 2em 1em">
+    <div class="container">
+      <h2>Timbre</h2>
+      <p id="messages" class="text-center"></p>
+
+      <h4>Setup</h4>
+      <form action="#" method="get" id="setupForm">
+        <ul class="list-inline">
+          <li>
+            <div class="radio">
+              <input
+                type="radio"
+                id="timbre_mode_1"
+                name="object_mode"
+                value="1"
+              />
+              <label for="timbre_mode_1">Recreo</label>
+            </div>
+          </li>
+          <li>
+            <div class="radio">
+              <input
+                type="radio"
+                id="timbre_mode_2"
+                name="object_mode"
+                value="2"
+              />
+              <label for="timbre_mode_2">Autonomo</label>
+            </div>
+          </li>
+          <li>
+            <div class="radio">
+              <input
+                type="radio"
+                id="timbre_mode_3"
+                name="object_mode"
+                value="3"
+              />
+              <label for="timbre_mode_3">Pomodoro</label>
+            </div>
+          </li>
+        </ul>
+
+        <p>
+          <label for="io_server">Server IP</label>
+          <input
+            id="io_server"
+            class="input"
+            name="io_server"
+            type="text"
+            placeholder="cargando..."
+          />
+        </p>
+        <p>
+          <label for="io_server">Server Port</label>
+          <input
+            id="io_server_port"
+            class="input"
+            name="io_server_port"
+            type="text"
+            placeholder="cargando..."
+          />
+        </p>
+
+        <p>
+          <button class="btn" type="submit" id="btnSave">Guardar</button>
+        </p>
+      </form>
+
+      <hr style="margin-top: 2em;" />
+      <a class="btn" href="/" role="button">Setup</a>
+      <a class="btn" href="/testing" role="button">Testing</a>
+      <a class="btn" href="/pomodoro" role="button">Pomodoro</a>
+    </div>
+
     <script>
-      setInterval(function() {
-        // Gets ADC value at every one second
-        GetADC();
-      }, 1000);
+      $(function() {
+        // Read initial config options
+        $.getJSON('/config.json', function(data) {
+          console.log(data);
+          $('#io_server').val(data.io_server);
+          $('#io_server_port').val(data.io_server_port);
+          var value = data.object_mode;
+          $('input[name=object_mode][value=' + value + ']').prop(
+            'checked',
+            true
+          );
+        });
 
-      function GetADC() {
-        var xhttp = new XMLHttpRequest();
-        var adc = 0;
-        xhttp.onreadystatechange = function() {
-          if (this.readyState == 4 && this.status == 200) {
-            adc = Number(this.responseText);
-            gauges.forEach(function(gauge) {
-              console.log(adc);
-              gauge.write(adc);
-            });
+        // Save config
+        $('#btnSave').on('click', function(e) {
+          e.preventDefault();
+          var io_server = $('#io_server').val();
+          var io_server_port = $('#io_server_port').val();
+          var object_mode_val = 1;
+          var object_mode = $('input[name=object_mode]:checked').val();
+          if (object_mode.length > 0) {
+            object_mode_val = object_mode.val();
           }
-        };
-        xhttp.open('GET', '/getADC', false);
-        xhttp.send();
-      }
 
-      var gauges = [];
-      var small = {
-        size: 100,
-        min: 0,
-        max: 50,
-        transitionDuration: 500,
+          $.ajax({
+            url:
+              '/save?io_server=' +
+              io_server +
+              '&io_server_port=' +
+              io_server_port +
+              '&object_mode=' +
+              object_mode_val,
+            success: function(result) {
+              console.log(result);
+              $('#messages').html(result);
+              // Update fields
+            }
+          });
+        });
 
-        label: 'label.text',
-        minorTicks: 4,
-        majorTicks: 5,
-        needleWidthRatio: 0.6,
-        needleContainerRadiusRatio: 0.7,
-
-        zones: [
-          { clazz: 'yellow-zone', from: 0.73, to: 0.9 },
-          { clazz: 'red-zone', from: 0.9, to: 1.0 }
-        ]
-      };
-
-      function createGauge(opts) {
-        var el = document.createElement('div');
-        el.setAttribute('class', 'gauge-container');
-        document.body.appendChild(el);
-        var g = d3Gauge(el, opts);
-        g.currentValue = g._range / 2;
-        gauges.push(g);
-      }
-
-      createGauge({ clazz: 'simple', label: 'Temperature' });
-      createGauge({ clazz: 'grayscale', label: 'Pressure' });
+        // setInterval(function() {
+        //   // Gets ADC value at every one second
+        //   GetADC();
+        // }, 1000);
+        // function GetADC() {
+        //   var xhttp = new XMLHttpRequest();
+        //   var adc = 0;
+        //   xhttp.onreadystatechange = function() {
+        //     if (this.readyState == 4 && this.status == 200) {
+        //       adc = Number(this.responseText);
+        //       gauges.forEach(function(gauge) {
+        //         console.log(adc);
+        //         gauge.write(adc);
+        //       });
+        //     }
+        //   };
+        //   xhttp.open('GET', '/getADC', false);
+        //   xhttp.send();
+        // }
+      });
     </script>
-    <hr />
-    <h4>Setup</h4>
-    <form action="save" method="get">
-      <p>
-        io_server:<br />
-        <input
-          class="input"
-          name="io_server"
-          type="text"
-          placeholder="dato actual"
-        />
-      </p>
-
-      <p>
-        io_server_port:<br />
-        <input
-          class="input"
-          name="io_server_port"
-          type="text"
-          placeholder="dato actual"
-        />
-      </p>
-
-      <p>
-        modo:<br />
-        <input
-          class="input"
-          name="object_mode"
-          type="number"
-          placeholder="dato actual"
-        />
-      </p>
-
-      <p><input class="btn" type="submit" value="GUARDAR" /></p>
-    </form>
   </body>
 </html>

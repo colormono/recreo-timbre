@@ -6,11 +6,11 @@ void setupServer() {
   server.on("/", handleRoot);
   server.on("/save", handleSave);
   server.on("/demo", handleDemo);
-  server.on("/pomodoro", handlePomodoro);
   server.on("/testing", handleTesting);
   server.on("/testRelay", testRelay);
+  server.on("/testLed", testLed);
   server.on("/testDisplay", testDisplay);
-  server.on("/getADC", handleADC); //Reads ADC function is called from out index.html
+  server.on("/pomodoro", handlePomodoro);
   server.onNotFound(handleWebRequests); //Set setver all paths are not found so we can handle as per URI
   server.begin();
   Serial.println("HTTP server started");
@@ -102,32 +102,49 @@ bool loadFromSpiffs(String path) {
   return true;
 }
 
-// --- RUTAS ---
-
-void handleADC() {
-  int a = analogRead(A0);
-  a = map(a, 0, 1023, 0, 100);
-  String adc = String(a);
-  Serial.println(adc);
-  server.send(200, "text/plane", adc);
-}
+// --- SETUP ---
 
 void handleRoot() {
   server.sendHeader("Location", "/index.html", true);
   server.send(302, "text/plane", "");
 }
 
+void handleSave() {
+  String msg;
+  StaticJsonBuffer<200> jsonBuffer;
+  JsonObject& json = jsonBuffer.createObject();
+
+  json["io_server"] = server.arg("io_server");
+  json["io_server_port"] = server.arg("io_server_port");
+  json["object_mode"] = server.arg("object_mode").toInt();
+
+  File configFile = SPIFFS.open("/config.json", "w");
+  if (!configFile) {
+    msg = "Error al abrir el archivo de configuración";
+  } else {
+    msg = "Configuracion Guardada!";
+  }
+
+  json.printTo(configFile);
+  server.send(200, "text/plane", msg);
+
+  // restart
+  //ESP.restart();
+}
+
+// --- TESTING ---
+
 void handleTesting() {
   server.sendHeader("Location", "/testing.html", true);
   server.send(302, "text/plane", "");
 }
 
-void handlePomodoro() {
-  server.sendHeader("Location", "/pomodoro.html", true);
-  server.send(302, "text/plane", "");
+void handleDemo() {
+  int timePlay = server.arg("timePlay").toInt();
+  int timeWork = server.arg("timeWork").toInt();
+  startRecreo(timePlay, timeWork);
+  //server.send(200, "text/html", body + msg + footer);
 }
-
-// --- TESTS ---
 
 void testRelay() {
   int value = server.arg("value").toInt();
@@ -139,34 +156,15 @@ void testRelay() {
   server.send(200, "text/plane", String(value));
 }
 
-void testDisplay() {
+void testLed() {
   int value = server.arg("value").toInt();
-  if ( value == 0) {
-    setDisplayLoading();
-  } else if ( value == 1) {
-    setDisplayPlay();
-  } else if ( value == 2 ) {
-    setDisplayCode();
-  } else {
-    display.print("COLORMONO");
-  }
-  server.send(200, "text/plane", String(value));
-}
-
-void handleRoot2() {
-  //server.send(200, "text/plain", "hello world from esp8266!");
-  //server.send(200, "text/html", body + msg + footer);
-
-  // Led
-  int ledState = server.arg("led").toInt();
-  if ( ledState == 1) {
+  if ( value == 1) {
     setLedSuccess();
-  } else if ( ledState == 2) {
+  } else if ( value == 2) {
     setLedWarning();
-  } else if ( ledState == 3 ) {
+  } else if ( value == 3 ) {
     setLedError();
   }
-
   // Led custom color
   int ledR = server.arg("r").toInt();
   int ledG = server.arg("g").toInt();
@@ -174,6 +172,36 @@ void handleRoot2() {
   if ( ledR && ledG && ledB ) {
     setColor(ledR, ledG, ledB);
   }
+  server.send(200, "text/plane", String(value));
+}
+
+void testDisplay() {
+  int value = server.arg("value").toInt();
+  if ( value == 0) {
+    setDisplayLoading();
+    display.clear();
+  } else if ( value == 1) {
+    setDisplayPlay();
+    display.clear();
+  } else if ( value == 2 ) {
+    setDisplayCode();
+    display.clear();
+  } else {
+    display.print("COLORMONO");
+  }
+  server.send(200, "text/plane", String(value));
+}
+
+// --- POMODORO ---
+
+void handlePomodoro() {
+  server.sendHeader("Location", "/pomodoro.html", true);
+  server.send(302, "text/plane", "");
+}
+
+void handleRoot2() {
+  //server.send(200, "text/plain", "hello world from esp8266!");
+  //server.send(200, "text/html", body + msg + footer);
 
   // Pomodoro
   int pomodoro = server.arg("pomodoro").toInt();
@@ -184,32 +212,4 @@ void handleRoot2() {
   }
 }
 
-void handleSave() {
-  StaticJsonBuffer<200> jsonBuffer;
-  JsonObject& json = jsonBuffer.createObject();
-
-  json["io_server"] = server.arg("io_server");
-  json["io_server_port"] = server.arg("io_server_port");
-  json["object_mode"] = server.arg("object_mode");
-
-  File configFile = SPIFFS.open("/config.json", "w");
-  if (!configFile) {
-    //msg = "Failed to open config file for writing";
-  } else {
-    //msg = "Configuracion Guardada...";
-  }
-
-  json.printTo(configFile);
-  //server.send(200, "text/html", body + msg + footer);
-
-  // restart
-  //ESP.restart();
-}
-
-void handleDemo() {
-  int timePlay = server.arg("timePlay").toInt();
-  int timeWork = server.arg("timeWork").toInt();
-  startRecreo(timePlay, timeWork);
-  //server.send(200, "text/html", body + msg + footer);
-}
 
