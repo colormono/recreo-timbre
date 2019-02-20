@@ -134,12 +134,36 @@ void setup() {
   // WIFI Connect
   //wifiManager.resetSettings();
   WiFiManager wifiManager;
+  //reset settings - for testing
+  //wifiManager.resetSettings();
 
+  //ESP static ip
+  IPAddress staticIP = IPAddress(192, 168, 1, 250);
+  //IP Address of your WiFi Router (Gateway)
+  IPAddress gateway = IPAddress(192, 168, 1, 1);
+  //Subnet mask
+  IPAddress subnet = IPAddress(255, 255, 255, 0);
+  //DNS
+  //IPAddress dns(8, 8, 8, 8);
+  
+  wifiManager.setSTAStaticIPConfig(staticIP, gateway, subnet);
+ 
   // Intentar conectarse con la data del EEPROM
   // sino inicializar como AP
-  wifiManager.autoConnect("TimbreAP");
+  //tries to connect to last known settings
+  //if it does not connect it starts an access point with the specified name
+  //here  "AutoConnectAP" with password "password"
+  //and goes into a blocking loop awaiting configuration
+  if (!wifiManager.autoConnect("TimbreAP")) {
+    Serial.println("failed to connect, we should reset as see if it connects");
+    delay(3000);
+    ESP.reset();
+    delay(5000);
+  }
   Serial.println("conectado... :)");
-
+  Serial.println("local ip");
+  Serial.println(WiFi.localIP());
+  
   //Initialize File System
   SPIFFS.begin();
   Serial.println("File System Initialized");
