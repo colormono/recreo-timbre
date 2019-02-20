@@ -129,7 +129,7 @@ void handleSave() {
   server.send(200, "text/plane", msg);
 
   // restart
-  //ESP.restart();
+  ESP.restart();
 }
 
 // --- TESTING ---
