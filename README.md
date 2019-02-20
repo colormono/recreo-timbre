@@ -16,6 +16,7 @@ Es el encargado de comunicar el comienzo y fin del recreo. Divide la temporalida
   - [Configurar WebSockets](#configurar-websockets)
   - [Testing](#testing)
 - [Circuito](#circuito)
+- [Hardware](#hardware)
 - [Código](#código)
   - [API](#api)
   - [Drivers](#drivers)
@@ -79,9 +80,19 @@ ESP will try to connect. If successful, it relinquishes control back to your app
 
 ## Circuito
 
-Reemplazar poner mi circuito final
+![alt text](./docs/Schematic_recreo-timbre.png 'Schematic')
 
-![alt text](./docs/external-supply.png 'External supply')
+## Hardware
+
+Lista de componentes utilizados
+
+- NodeMCU 1.0 (ESP-12E Module)
+- Modulo Display 4 digitos Catalex
+- Modulo 1 Relay
+- Modulo 1 Led RGB
+- Timbre 220v
+- Fuente de alimentación para protoboard 5v, 3.3v
+- Fuente de alimentación 5v 2amp
 
 ## Código
 
