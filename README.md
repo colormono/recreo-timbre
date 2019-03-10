@@ -11,17 +11,16 @@ Es el encargado de comunicar el comienzo y fin del recreo. Divide la temporalida
 ## Indice
 
 - [Instrucciones](#instrucciones)
-- [Flujo de trabajo](#flujo-de-trabajo)
   - [Configurar AP](#configurar-ap)
   - [Configurar WebSockets](#configurar-websockets)
   - [Testing](#testing)
+- [API](#api)
+- [Flujo de trabajo](#flujo-de-trabajo)
 - [Circuito](#circuito)
 - [Hardware](#hardware)
 - [Código](#código)
-  - [API](#api)
   - [Drivers](#drivers)
   - [Librerías](#librerías)
-  - [API](#api)
   - [Ejemplos](#ejemplos)
 - [Enlaces útiles](#enlaces-útiles)
 
@@ -74,6 +73,18 @@ ESP will try to connect. If successful, it relinquishes control back to your app
 - Ruta "/testing": Probar funcionalidades
 - Ruta "/pomodoro": Configurar Pomodoro
 
+## API
+
+Endpoints consumidos por el dispositivo:
+
+| Endpoint            | Verb | Description                                        |
+| ------------------- | ---- | -------------------------------------------------- |
+| `/v1/recreo`        | GET  | If set to true, the result will also include cats. |
+| `/v1/recreo/estado` | GET  | If set to true, the result will also include cats. |
+| `/v1/recreo/estado` | PUT  | If set to true, the result will also include cats. |
+
+**[Documentación API](https://colormono.com/recreo/api/reference/)**
+
 ## Flujo de trabajo
 
 ![Columpio v1](./docs/workflow.jpg)
@@ -96,19 +107,7 @@ Lista de componentes utilizados
 
 ## Código
 
-Para poder compilar el código y subirlo al microcontrolador es rquerido que estén instalados los drivers y las librerías listadas a continuación.
-
-Las versiones de las librerías utilizadas al momento de desarrollo del proyecto se encuentran en el directorio `/libraries`.
-
-### API
-
-Endpoints consumidos por el dispositivo:
-
-- GET | `/v1/recreo`
-- GET | `/v1/recreo/estado`
-- PUT | `/v1/recreo/estado`
-
-**[Documentación API](https://colormono.com/recreo/api/reference/)**
+Para poder compilar el código y subirlo al microcontrolador es requerido que estén instalados los drivers y las librerías listadas a continuación.
 
 ### Drivers
 
@@ -116,6 +115,8 @@ Endpoints consumidos por el dispositivo:
 - [Driver CH340 MacOS](https://www.geekfactory.mx/download/driver-ch340-macos/) - Driver alternativo para dispositivos chinos
 
 ### Librerías
+
+Las versiones de las librerías utilizadas al momento de desarrollo del proyecto se encuentran en el directorio `/libraries`.
 
 - [Arduino ESP8266](https://github.com/esp8266/Arduino) - Soporte para ESP8266 (Instrucciones de instalación en el link)
 - [Arduino WebSockets](https://github.com/Links2004/arduinoWebSockets) - Soporte para WebSockets. Usar la versión 5.\*. Prestar especial atención porque Arduino instala por defecto la 6.

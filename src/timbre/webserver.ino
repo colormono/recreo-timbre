@@ -130,6 +130,7 @@ void handleSave() {
 
   // restart
   ESP.restart();
+  delay(5000);
 }
 
 // --- TESTING ---
