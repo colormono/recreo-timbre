@@ -5,7 +5,7 @@
 void startModeRecreo() {
   setDisplayText("RECREO");
   // Connect to WebSocket server
-  webSocket.beginSocketIO(io_server, io_server_port);
+  webSocket.beginSocketIO(reglas_server, 4001);
   webSocket.onEvent(webSocketEvent);
   delay(2000);
   display.clear();

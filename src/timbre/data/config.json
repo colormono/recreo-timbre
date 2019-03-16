@@ -1,5 +1,9 @@
 {
-  "io_server": "192.168.0.6",
-  "io_server_port": 4001,
-  "object_mode": 1
+  "reglas_server": "192.168.0.6",
+  "reglas_port": "4001",
+  "timbre_name": "timbre",
+  "object_mode": "1",
+  "ip": "192.168.1.250",
+  "gateway": "192.168.1.1",
+  "subnet": "255.255.255.0"
 }

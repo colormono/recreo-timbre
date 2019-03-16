@@ -11,6 +11,7 @@ void setupServer() {
   server.on("/testLed", testLed);
   server.on("/testDisplay", testDisplay);
   server.on("/pomodoro", handlePomodoro);
+  server.on("/reset", handleReset);
   server.onNotFound(handleWebRequests); //Set setver all paths are not found so we can handle as per URI
   server.begin();
   Serial.println("HTTP server started");
@@ -34,48 +35,48 @@ void handleWebRequests() {
   Serial.println(message);
 }
 
-bool loadConfig() {
-  File configFile = SPIFFS.open("/config.json", "r");
-  if (!configFile) {
-    Serial.println("Failed to open config file");
-    return false;
-  }
-
-  size_t size = configFile.size();
-  if (size > 1024) {
-    Serial.println("Config file size is too large");
-    return false;
-  }
-
-  // Allocate a buffer to store contents of the file.
-  std::unique_ptr<char[]> buf(new char[size]);
-
-  // We don't use String here because ArduinoJson library requires the input
-  // buffer to be mutable. If you don't use ArduinoJson, you may as well
-  // use configFile.readString instead.
-  configFile.readBytes(buf.get(), size);
-
-  StaticJsonBuffer<200> jsonBuffer;
-  JsonObject& json = jsonBuffer.parseObject(buf.get());
-
-  if (!json.success()) {
-    Serial.println("Failed to parse config file");
-    return false;
-  }
-
-  // Store values for later use.
-  io_server = json["io_server"].as<String>();
-  object_mode = json["object_mode"];
-  const char* io_server_port = json["io_server_port"];
-  Serial.print("Loaded io_server: ");
-  Serial.println(io_server);
-  Serial.print("Loaded io_server_port: ");
-  Serial.println(io_server_port);
-  Serial.print("Loaded object_mode: ");
-  Serial.println(object_mode);
-
-  return true;
-}
+//bool loadConfig() {
+//  File configFile = SPIFFS.open("/config.json", "r");
+//  if (!configFile) {
+//    Serial.println("Failed to open config file");
+//    return false;
+//  }
+//
+//  size_t size = configFile.size();
+//  if (size > 1024) {
+//    Serial.println("Config file size is too large");
+//    return false;
+//  }
+//
+//  // Allocate a buffer to store contents of the file.
+//  std::unique_ptr<char[]> buf(new char[size]);
+//
+//  // We don't use String here because ArduinoJson library requires the input
+//  // buffer to be mutable. If you don't use ArduinoJson, you may as well
+//  // use configFile.readString instead.
+//  configFile.readBytes(buf.get(), size);
+//
+//  StaticJsonBuffer<200> jsonBuffer;
+//  JsonObject& json = jsonBuffer.parseObject(buf.get());
+//
+//  if (!json.success()) {
+//    Serial.println("Failed to parse config file");
+//    return false;
+//  }
+//
+//  // Store values for later use.
+//  reglas_server = json["reglas_server"].as<String>();
+//  object_mode = json["object_mode"];
+//  const char* reglas_port = json["reglas_port"];
+//  Serial.print("Loaded reglas_server: ");
+//  Serial.println(reglas_server);
+//  Serial.print("Loaded reglas_port: ");
+//  Serial.println(reglas_port);
+//  Serial.print("Loaded object_mode: ");
+//  Serial.println(object_mode);
+//
+//  return true;
+//}
 
 bool loadFromSpiffs(String path) {
   String dataType = "text/plain";
@@ -109,13 +110,22 @@ void handleRoot() {
   server.send(302, "text/plane", "");
 }
 
+void handleReset() {
+  server.sendHeader("Location", "/reset.html", true);
+  server.send(302, "text/plane", "RESET");
+  delay(1000);
+  WiFi.disconnect(true);
+  delay(2000);
+  ESP.reset();
+}
+
 void handleSave() {
   String msg;
   StaticJsonBuffer<200> jsonBuffer;
   JsonObject& json = jsonBuffer.createObject();
 
-  json["io_server"] = server.arg("io_server");
-  json["io_server_port"] = server.arg("io_server_port");
+  json["reglas_server"] = server.arg("reglas_server");
+  json["reglas_port"] = server.arg("reglas_port");
   json["object_mode"] = server.arg("object_mode").toInt();
 
   File configFile = SPIFFS.open("/config.json", "w");
@@ -129,7 +139,9 @@ void handleSave() {
   server.send(200, "text/plane", msg);
 
   // restart
-  ESP.restart();
+  //ESP.restart();
+  delay(1000);
+  ESP.reset();
   delay(5000);
 }
 

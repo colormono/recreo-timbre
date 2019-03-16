@@ -54,21 +54,21 @@
         </ul>
 
         <p>
-          <label for="io_server">Server IP</label>
+          <label for="reglas_server">Server IP</label>
           <input
-            id="io_server"
+            id="reglas_server"
             class="input"
-            name="io_server"
+            name="reglas_server"
             type="text"
             placeholder="cargando..."
           />
         </p>
         <p>
-          <label for="io_server">Server Port</label>
+          <label for="reglas_server">Server Port</label>
           <input
-            id="io_server_port"
+            id="reglas_port"
             class="input"
-            name="io_server_port"
+            name="reglas_port"
             type="text"
             placeholder="cargando..."
           />
@@ -83,6 +83,7 @@
       <a class="btn" href="/" role="button">Setup</a>
       <a class="btn" href="/testing" role="button">Testing</a>
       <a class="btn" href="/pomodoro" role="button">Pomodoro</a>
+      <a class="btn" href="/reset" role="button">Reset</a>
     </div>
 
     <script>
@@ -90,8 +91,8 @@
         // Read initial config options
         $.getJSON('/config.json', function(data) {
           console.log(data);
-          $('#io_server').val(data.io_server);
-          $('#io_server_port').val(data.io_server_port);
+          $('#reglas_server').val(data.reglas_server);
+          $('#reglas_port').val(data.reglas_port);
           var value = data.object_mode;
           $('input[name=object_mode][value=' + value + ']').prop(
             'checked',
@@ -102,20 +103,20 @@
         // Save config
         $('#btnSave').on('click', function(e) {
           e.preventDefault();
-          var io_server = $('#io_server').val();
-          var io_server_port = $('#io_server_port').val();
+          var reglas_server = $('#reglas_server').val();
+          var reglas_port = $('#reglas_port').val();
           var object_mode_val = 1;
-          var object_mode = $('input[name=object_mode]:checked').val();
+          var object_mode = $('input[name=object_mode]:checked');
           if (object_mode.length > 0) {
             object_mode_val = object_mode.val();
           }
 
           $.ajax({
             url:
-              '/save?io_server=' +
-              io_server +
-              '&io_server_port=' +
-              io_server_port +
+              '/save?reglas_server=' +
+              reglas_server +
+              '&reglas_port=' +
+              reglas_port +
               '&object_mode=' +
               object_mode_val,
             success: function(result) {

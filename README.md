@@ -146,3 +146,4 @@ En el directorio `/examples` se encuentran sketchs con posibles soluciones a los
 - [ESP8266 Ajax Update without refreshing](https://circuits4you.com/2018/02/04/esp8266-ajax-update-part-of-web-page-without-refreshing/)
 - [ESP8266 Json parsing example](https://circuits4you.com/2019/01/11/nodemcu-esp8266-arduino-json-parsing-example/)
 - [ESP8266 data logging with real time graphs](https://circuits4you.com/2019/01/11/esp8266-data-logging-with-real-time-graphs/)
+- [Arduino Library](https://www.arduino.cc/en/Hacking/LibraryTutorial)
