@@ -23,7 +23,7 @@ const char* wifi_ssid = "quale-privada";
 const char* wifi_password = "quale2010pri";
 
 // Server
-const char* io_server = "192.168.1.107";
+const char* io_server = "192.168.1.108";
 uint64_t io_server_port = 4001;
 
 // WebSockets

@@ -17,6 +17,7 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
         // send message to server when Connected
         // socket.io upgrade confirmation message (required)
         webSocket.sendTXT("5");
+        webSocket.sendTXT("42[\"device:connected\",{\"device\":\"timbre\"}]");
       }
       break;
 
@@ -27,38 +28,26 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
         int pos = text.indexOf('{');
         String msg = text.substring(pos, text.length() - 1);
 
-        // Llave a controlar
+        // Nombre del evento
         int keyPosInit = text.indexOf('"') + 1;
         int keyPosEnd = text.indexOf('"', keyPosInit);
         String key = text.substring(keyPosInit, keyPosEnd);
-        Serial.println("Key: " + key);
+        Serial.println("Evento: " + key);
 
-        // Analizar payload según clave
-        /*
-          switch (key) {
-          case "led":
-            //Hacer algo sólo para el led
-            break;
-          default:
-            break;
-          }
-        */
-        parseMsg(msg);
-
-        // send message to server
-        // webSocket.sendTXT("message here");
+        // Analizar payload según evento
+        if (key == "update:timbre" ) {
+          parseMsg(msg);
+        }
       }
       break;
 
     case WStype_BIN:
       Serial.printf("[WSc] get binary length: %u\n", length);
       hexdump(payload, length);
-
       // send data to server
       // webSocket.sendBIN(payload, length);
       break;
   }
-
 }
 
 void parseMsg(String msg) {
@@ -73,15 +62,17 @@ void parseMsg(String msg) {
   }
 
   // Fetch values
-
-  // Estado
-  const char* estado = root["status"];
-  Serial.print("estado: ");
-  Serial.println(estado);
-  if ( strcmp(estado, "sonando") == 0 ) {
-    ringOn();
-  } else {
-    ringOff();
+  int led = root["led"];
+  Serial.print("led: ");
+  Serial.println(led);
+  if (led == 1) {
+    setLedWarning();
+  }
+  else if (led == 2) {
+    setLedSuccess();
+  }
+  else {
+    setLedError();
   }
 
   // Energía
@@ -94,27 +85,21 @@ void parseMsg(String msg) {
   Serial.print("tempo: ");
   Serial.println(tempo);
 
+  //  // Estado
+  //  const char* estado = root["status"];
+  //  Serial.print("estado: ");
+  //  Serial.println(estado);
+  //  if ( strcmp(estado, "sonando") == 0 ) {
+  //    ringOn();
+  //  } else {
+  //    ringOff();
+  //  }
+
   /*
     // Palabra Clave
     String palabraClave = root["palabraClave"];
     Serial.print("palabraClave: ");
     Serial.println(palabraClave);
     display.print(palabraClave);
-  */
-
-  /*
-    // Paleta
-    int r = root["palette"][0]["r"];
-    int g = root["palette"][0]["g"];
-    int b = root["palette"][0]["b"];
-    analogWrite(LED_RED,    r);
-    analogWrite(LED_GREEN,  g);
-    analogWrite(LED_BLUE,   b);
-    Serial.print("r: ");
-    Serial.println(r);
-    Serial.print("g: ");
-    Serial.println(g);
-    Serial.print("b: ");
-    Serial.println(b);
   */
 }

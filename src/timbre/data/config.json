@@ -1,5 +1,5 @@
 {
-  "reglas_server": "192.168.0.6",
+  "reglas_server": "192.168.1.108",
   "reglas_port": "4001",
   "timbre_name": "timbre",
   "object_mode": "1",

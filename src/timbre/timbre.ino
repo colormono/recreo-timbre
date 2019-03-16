@@ -8,13 +8,12 @@
    - Genera un webserver para testing y control remoto
 */
 
-#include <FS.h>   //Include File System Headers
+#include <FS.h>
 #include <ESP8266WiFi.h>
 #include <DNSServer.h>
 #include <ESP8266WebServer.h>
 #include <WiFiManager.h>
-#include "libraries/ArduinoJson/ArduinoJson.h"
-//#include <SPI.h>
+#include "libraries/ArduinoJson.h"
 
 #include <string.h>
 #include <Chrono.h>
@@ -75,19 +74,6 @@ void testRelay();
 void testLed();
 void testDisplay();
 
-// --- INPUTS ---
-
-// WebSockets
-WebSocketsClient webSocket;
-#define MESSAGE_INTERVAL 30000
-#define HEARTBEAT_INTERVAL 25000
-uint64_t messageTimestamp = 0;
-uint64_t heartbeatTimestamp = 0;
-bool isConnected = false;
-void webSocketEvent(WStype_t type, uint8_t * payload, size_t length);
-void parseMsg(String msg);
-
-
 // --- OUTPUTS ---
 
 // Output: Led
@@ -108,7 +94,7 @@ void ring(long tiempo);
 // Output: Display
 #define PIN_DIO     5  // D1
 #define PIN_CLK     4  // PWM D2
-int displayBright = 100; // Brillo al 10%, usar 100% en producción
+int displayBright = 100;
 SevenSegmentFun display(PIN_CLK, PIN_DIO);
 void showLocalIp();
 void setDisplayText(char* str);
@@ -125,6 +111,18 @@ void startFocus(int timer);
 void startBreak(int timer);
 void startRecreo();
 void startRecreo(int timePlay, int timeWork);
+
+// --- INPUTS ---
+
+// WebSockets
+WebSocketsClient webSocket;
+#define MESSAGE_INTERVAL 30000
+#define HEARTBEAT_INTERVAL 25000
+uint64_t messageTimestamp = 0;
+uint64_t heartbeatTimestamp = 0;
+bool isConnected = false;
+void webSocketEvent(WStype_t type, uint8_t * payload, size_t length);
+void parseMsg(String msg);
 
 
 // --- SETUP ---
@@ -276,7 +274,7 @@ void setup() {
     json["reglas_port"] = reglas_port;
     json["timbre_name"] = timbre_name;
     json["object_mode"] = "1";
-    
+
     json["ip"] = WiFi.localIP().toString();
     json["gateway"] = WiFi.gatewayIP().toString();
     json["subnet"] = WiFi.subnetMask().toString();
@@ -308,59 +306,39 @@ void setup() {
   setupServer();
   showLocalIp();
 
-  // SWITCH MODE
-  switch (object_mode) {
-    case 1:
-      startModeRecreo();
-      break;
-    case 2:
-      startModeAutonomo();
-      break;
-    case 3:
-      startModePomodoro();
-      break;
+  // START MODE
+  if (object_mode == 1) {
+    startModeRecreo();
+  } else if (object_mode == 2) {
+    startModeAutonomo();
+  } else {
+    startModePomodoro();
   }
 }
-
 
 // --- LOOP ---
 
 void loop() {
-  // Server
-  server.handleClient();
-
-  // Recreo WS
   if (object_mode == 1) {
     webSocket.loop();
-
-    // Si está conectado
     if (isConnected) {
       uint64_t now = millis();
-
-      // Enviar saludo
-      if (now - messageTimestamp > MESSAGE_INTERVAL) {
-        messageTimestamp = now;
-        // example socket.io message with type "messageType" and JSON payload
-        webSocket.sendTXT("42[\"messageType\",{\"greeting\":\"hello\"}]");
-      }
-
       // Enviar muestra de vida
       if ((now - heartbeatTimestamp) > HEARTBEAT_INTERVAL) {
         heartbeatTimestamp = now;
-        // socket.io heartbeat message
-        webSocket.sendTXT("2[\"heartBeat\",{\"heartBeat\":\"1\"}]");
+        webSocket.sendTXT("2");
+        Serial.println("sending heartBeat");
       }
     }
+  } else if (object_mode == 2) {
+    Serial.println("Update autonomo mode");
+    //updateModeAutonomo();
+  } else {
+    Serial.println("Update pomodoro mode");
+    //updateModePomodoro();
   }
 
-  // Autonomo
-  else if (object_mode == 2) {
-    //startRecreo();
-  }
-
-  // Pomodoro
-  else if (object_mode == 3) {
-    // control from app
-  }
+  // Server
+  server.handleClient();
 }
 
