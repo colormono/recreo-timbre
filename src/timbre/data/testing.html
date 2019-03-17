@@ -55,18 +55,18 @@
           $.ajax({
             url: '/testRelay?value=1',
             success: function(result) {
-              var status = result ? 'encendido' : 'apagado';
-              $('#messages').html('Relay ' + status);
+              console.log(result);
+              $('#messages').html('Relay encendido');
             }
           });
         });
 
         $('#relayOff').on('click', function() {
           $.ajax({
-            url: '/testRelay?value=0',
+            url: '/testRelay?value=2',
             success: function(result) {
-              var status = result ? 'encendido' : 'apagado';
-              $('#messages').html('Relay ' + status);
+              console.log(result);
+              $('#messages').html('Relay apagado');
             }
           });
         });

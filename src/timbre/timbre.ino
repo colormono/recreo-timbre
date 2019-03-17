@@ -77,8 +77,8 @@ void testDisplay();
 // --- OUTPUTS ---
 
 // Output: Led
-#define LED_RED     15 // PWM D8
-#define LED_GREEN   12 // PWM D6
+#define LED_RED     12 // PWM D6
+#define LED_GREEN   15 // PWM D8
 #define LED_BLUE    13 // D7
 void setColor(int r, int g, int b);
 void setLedError();
@@ -323,7 +323,7 @@ void loop() {
     webSocket.loop();
     if (isConnected) {
       uint64_t now = millis();
-      // Enviar muestra de vida
+      // sendHeartbeatToServer
       if ((now - heartbeatTimestamp) > HEARTBEAT_INTERVAL) {
         heartbeatTimestamp = now;
         webSocket.sendTXT("2");

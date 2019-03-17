@@ -163,7 +163,7 @@ void testRelay() {
   int value = server.arg("value").toInt();
   if ( value == 1) {
     ringOn();
-  } else {
+  } else if ( value == 2) {
     ringOff();
   }
   server.send(200, "text/plane", String(value));

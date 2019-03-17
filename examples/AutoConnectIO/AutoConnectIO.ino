@@ -6,6 +6,9 @@
 #include <WiFiManager.h>         //https://github.com/tzapu/WiFiManager
 
 #include <WebSocketsClient.h>
+#include <Hash.h>
+WebSocketsClient webSocket;
+
 
 //default custom static IP
 char static_ip[16] = "192.168.1.250";
