@@ -205,6 +205,7 @@ void goToItem(int item)
   servo.write(item * 30);
   delay(2000);
   servo.detach();
+  delay(1000);
 }
 
 void ring()
@@ -212,7 +213,7 @@ void ring()
   digitalWrite(relayPin, LOW);
   delay(33);
   digitalWrite(relayPin, HIGH);
-  delay(1500);
+  delay(2000);
 }
 
 void ringDouble()
@@ -224,7 +225,7 @@ void ringDouble()
   digitalWrite(relayPin, LOW);
   delay(33);
   digitalWrite(relayPin, HIGH);
-  delay(1500);
+  delay(2000);
 }
 
 void displayLoadAnim()
