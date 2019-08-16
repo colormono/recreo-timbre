@@ -1,0 +1,5 @@
+{
+    "board": "arduino:avr:uno",
+    "port": "/dev/cu.wchusbserial14510",
+    "sketch": "build.ino"
+}
